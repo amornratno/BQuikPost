@@ -1,0 +1,1425 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>B-Quik Executive Report | The Quick Recovery</title>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    :root {
+      --bq-yellow: #FFD100;
+      --bq-yellow-soft: #FFF9DB;
+      --bq-black: #141416;
+      --bq-charcoal: #232327;
+      --bq-gray: #6B7280;
+      --bq-border: #E5E7EB;
+      --bq-bg: #F3F4F6;
+      --bq-white: #FFFFFF;
+      --pass-color: #15803D;
+      --pass-bg: #DCFCE7;
+      --fail-color: #B91C1C;
+      --fail-bg: #FEE2E2;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Prompt', sans-serif;
+    }
+
+    body {
+      background-color: var(--bq-bg);
+      color: var(--bq-black);
+      line-height: 1.45;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ================= SCREEN TOP BAR ================= */
+    .top-navbar {
+      background-color: var(--bq-black);
+      color: var(--bq-white);
+      border-bottom: 4px solid var(--bq-yellow);
+      padding: 12px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 14px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .brand-logo {
+      height: 44px;
+      width: auto;
+      border-radius: 6px;
+      background: var(--bq-yellow);
+      border: 1.5px solid var(--bq-yellow);
+      object-fit: contain;
+    }
+
+    .brand-fallback {
+      background: var(--bq-yellow);
+      color: var(--bq-black);
+      font-weight: 800;
+      font-size: 1.2rem;
+      padding: 4px 12px;
+      border-radius: 6px;
+      display: none;
+    }
+
+    .brand-text h1 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--bq-yellow);
+      letter-spacing: 0.2px;
+    }
+
+    .brand-text p {
+      font-size: 0.78rem;
+      color: #D1D5DB;
+    }
+
+    .toolbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.18s ease;
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--bq-white);
+      border: 1.5px solid #4B5563;
+    }
+
+    .btn-ghost:hover {
+      border-color: var(--bq-yellow);
+      color: var(--bq-yellow);
+    }
+
+    .btn-outline-yellow {
+      background: transparent;
+      color: var(--bq-yellow);
+      border: 1.5px solid var(--bq-yellow);
+    }
+
+    .btn-outline-yellow:hover {
+      background: var(--bq-yellow);
+      color: var(--bq-black);
+    }
+
+    .btn-yellow {
+      background: var(--bq-yellow);
+      color: var(--bq-black);
+    }
+
+    .btn-yellow:hover {
+      background: #F2C200;
+    }
+
+    /* ================= BENCHMARK BAR (SCREEN ONLY) ================= */
+    .benchmark-strip {
+      background: var(--bq-charcoal);
+      color: var(--bq-white);
+      padding: 10px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      border-bottom: 1px solid #374151;
+      font-size: 0.82rem;
+    }
+
+    .benchmark-metrics {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .bm-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .bm-label {
+      color: #9CA3AF;
+    }
+
+    .bm-val {
+      font-weight: 700;
+      color: var(--bq-yellow);
+      font-size: 0.9rem;
+    }
+
+    .bm-diff {
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    .bm-diff.up {
+      background: rgba(21, 128, 61, 0.25);
+      color: #4ADE80;
+      border: 1px solid #16A34A;
+    }
+
+    .bm-diff.down {
+      background: rgba(185, 28, 28, 0.25);
+      color: #F87171;
+      border: 1px solid #DC2626;
+    }
+
+    .bm-diff.neutral {
+      background: rgba(255, 209, 0, 0.15);
+      color: var(--bq-yellow);
+      border: 1px solid var(--bq-yellow);
+    }
+
+    /* ================= TABS NAVIGATION (SCREEN ONLY) ================= */
+    .tabs-wrapper {
+      max-width: 210mm;
+      margin: 16px auto 0 auto;
+      background: var(--bq-white);
+      padding: 10px 14px;
+      border-radius: 8px;
+      border-left: 5px solid var(--bq-black);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .tabs-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .tab-pill {
+      padding: 6px 13px;
+      border-radius: 6px;
+      border: 1.5px solid var(--bq-black);
+      background: var(--bq-white);
+      color: var(--bq-black);
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .tab-pill:hover {
+      background: var(--bq-yellow-soft);
+    }
+
+    .tab-pill.active {
+      background: var(--bq-black);
+      color: var(--bq-yellow);
+    }
+
+    .sync-status {
+      font-size: 0.74rem;
+      color: var(--bq-gray);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .dot-live {
+      width: 8px;
+      height: 8px;
+      background: #16A34A;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    /* ================= REPORT SHEET CONTAINER ================= */
+    #reportWorkspace {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px 0 36px 0;
+      gap: 24px;
+    }
+
+    .a4-page-block {
+      width: 210mm;
+      min-height: 296mm;
+      background: var(--bq-white);
+      padding: 11mm 13mm;
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12);
+      border-radius: 4px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    @media (max-width: 820px) {
+      .tabs-wrapper, .a4-page-block {
+        width: 95%;
+        min-height: auto;
+        padding: 16px;
+      }
+      .kpi-row, .charts-row, .batch-grid, .item-grid-2col {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+    /* Formal Header (Shown cleanly on screen & print) */
+    .formal-header {
+      background: var(--bq-black);
+      color: var(--bq-white);
+      padding: 12px 16px;
+      border-bottom: 4px solid var(--bq-yellow);
+      border-radius: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .fh-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .fh-logo {
+      height: 48px;
+      width: auto;
+      border-radius: 5px;
+      background: var(--bq-yellow);
+      border: 1.5px solid var(--bq-yellow);
+      object-fit: contain;
+    }
+
+    .fh-title h2 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--bq-yellow);
+      line-height: 1.25;
+    }
+
+    .fh-title p {
+      font-size: 0.74rem;
+      color: #E5E7EB;
+      margin-top: 2px;
+    }
+
+    .fh-right {
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    .fh-badge {
+      background: var(--bq-yellow);
+      color: var(--bq-black);
+      font-weight: 800;
+      font-size: 0.74rem;
+      padding: 2px 10px;
+      border-radius: 4px;
+      display: inline-block;
+    }
+
+    .fh-meta {
+      font-size: 0.68rem;
+      color: #D1D5DB;
+      margin-top: 3px;
+    }
+
+    /* KPI Cards */
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    .kpi-box {
+      border: 1px solid var(--bq-border);
+      border-top: 4px solid var(--bq-yellow);
+      border-radius: 6px;
+      padding: 9px 11px;
+      background: #FAFAFA;
+    }
+
+    .kpi-box.highlight {
+      background: var(--bq-black);
+      color: var(--bq-white);
+      border-color: var(--bq-black);
+    }
+
+    .kpi-title {
+      font-size: 0.71rem;
+      color: var(--bq-gray);
+      font-weight: 500;
+    }
+
+    .kpi-box.highlight .kpi-title {
+      color: #D1D5DB;
+    }
+
+    .kpi-num {
+      font-size: 1.42rem;
+      font-weight: 800;
+      line-height: 1.15;
+      margin: 3px 0;
+    }
+
+    .kpi-box.highlight .kpi-num {
+      color: var(--bq-yellow);
+    }
+
+    .kpi-foot {
+      font-size: 0.68rem;
+      color: var(--bq-gray);
+    }
+
+    .kpi-box.highlight .kpi-foot {
+      color: #9CA3AF;
+    }
+
+    /* Charts Row */
+    .charts-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .panel-card {
+      border: 1px solid var(--bq-border);
+      border-radius: 6px;
+      padding: 9px 11px;
+      background: var(--bq-white);
+    }
+
+    .panel-head {
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding-bottom: 5px;
+      margin-bottom: 7px;
+      border-bottom: 1.5px solid var(--bq-black);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .panel-tag {
+      background: var(--bq-yellow);
+      color: var(--bq-black);
+      font-size: 0.66rem;
+      padding: 1px 7px;
+      border-radius: 3px;
+      font-weight: 700;
+    }
+
+    .chart-wrap {
+      position: relative;
+      height: 155px;
+      width: 100%;
+    }
+
+    /* Batch Cards Grid (for Overview) */
+    .batch-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 9px;
+    }
+
+    .batch-item-card {
+      border: 1.5px solid var(--bq-black);
+      border-radius: 6px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      break-inside: avoid;
+    }
+
+    .bic-head {
+      background: var(--bq-black);
+      color: var(--bq-yellow);
+      padding: 5px 9px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .bic-date {
+      background: var(--bq-yellow);
+      color: var(--bq-black);
+      font-size: 0.65rem;
+      padding: 1px 6px;
+      border-radius: 3px;
+    }
+
+    .bic-body {
+      padding: 6px 9px;
+      font-size: 0.72rem;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .bic-row {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px dashed #EEEEEE;
+      padding-bottom: 2px;
+    }
+
+    .bic-row:last-child {
+      border-bottom: none;
+    }
+
+    .bic-clickable {
+      cursor: pointer;
+    }
+
+    .bic-clickable:hover {
+      background: var(--bq-yellow-soft);
+    }
+
+    .bic-foot {
+      background: var(--bq-yellow-soft);
+      padding: 5px 9px;
+      border-top: 1px solid #FDE68A;
+      margin-top: auto;
+    }
+
+    .bar-track {
+      width: 100%;
+      height: 6px;
+      background: #E5E7EB;
+      border-radius: 3px;
+      overflow: hidden;
+      margin-top: 3px;
+    }
+
+    .bar-fill {
+      height: 100%;
+      background: var(--pass-color);
+    }
+
+    /* Question Accuracy Bars & Summary List */
+    .item-grid-2col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px 14px;
+    }
+
+    .q-metric-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 0.7rem;
+      padding: 3px 0;
+      border-bottom: 1px dashed #E5E7EB;
+    }
+
+    .q-metric-title {
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .q-metric-bar {
+      width: 90px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      flex-shrink: 0;
+    }
+
+    .q-fill-low {
+      background: #DC2626;
+    }
+
+    .q-fill-mid {
+      background: var(--bq-black);
+    }
+
+    .q-fill-high {
+      background: #15803D;
+    }
+
+    /* Formal Footer */
+    .formal-footer {
+      margin-top: auto;
+      padding-top: 6px;
+      border-top: 1px solid #D1D5DB;
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.67rem;
+      color: var(--bq-gray);
+    }
+
+    /* Modal Popup */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.72);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+      padding: 16px;
+    }
+
+    .modal-card {
+      background: var(--bq-white);
+      width: 100%;
+      max-width: 600px;
+      max-height: 82vh;
+      border-radius: 8px;
+      border: 2px solid var(--bq-black);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .modal-head {
+      background: var(--bq-black);
+      color: var(--bq-yellow);
+      padding: 12px 16px;
+      border-bottom: 4px solid var(--bq-yellow);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-close {
+      background: var(--bq-yellow);
+      color: var(--bq-black);
+      border: none;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .modal-content {
+      padding: 14px 16px;
+      overflow-y: auto;
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+    }
+
+    .data-table th {
+      background: #1F2937;
+      color: var(--bq-yellow);
+      padding: 7px 9px;
+      text-align: left;
+    }
+
+    .data-table td {
+      padding: 7px 9px;
+      border-bottom: 1px solid #E5E7EB;
+    }
+
+    .pill-status {
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.74rem;
+    }
+
+    .pill-pass {
+      background: var(--pass-bg);
+      color: var(--pass-color);
+    }
+
+    .pill-fail {
+      background: var(--fail-bg);
+      color: var(--fail-color);
+    }
+
+    /* Loader */
+    #loaderScreen {
+      position: fixed;
+      inset: 0;
+      background: rgba(20, 20, 22, 0.94);
+      color: var(--bq-yellow);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      gap: 12px;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(255, 209, 0, 0.25);
+      border-top-color: var(--bq-yellow);
+      border-radius: 50%;
+      animation: spin 0.85s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ================= A4 PRINT / PDF RULES ================= */
+    @media print {
+      @page {
+        size: A4 portrait;
+        margin: 8mm 10mm;
+      }
+
+      html, body {
+        background: #FFFFFF !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+
+      /* ซ่อนแถบเมนูเว็บ, แถบ Benchmark, แถบ Tabs และปุ่มโต้ตอบทั้งหมด */
+      .top-navbar,
+      .benchmark-strip,
+      .tabs-wrapper,
+      .no-print,
+      .modal-overlay,
+      #loaderScreen {
+        display: none !important;
+      }
+
+      #reportWorkspace {
+        padding: 0 !important;
+        gap: 0 !important;
+        display: block !important;
+      }
+
+      .a4-page-block {
+        width: 100% !important;
+        min-height: 278mm !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        page-break-after: always;
+        break-after: page;
+      }
+
+      .a4-page-block:last-child {
+        page-break-after: auto;
+        break-after: auto;
+      }
+
+      .kpi-row {
+        grid-template-columns: repeat(4, 1fr) !important;
+      }
+
+      .charts-row {
+        grid-template-columns: 1fr 1fr !important;
+      }
+
+      .batch-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+      }
+
+      .item-grid-2col {
+        grid-template-columns: 1fr 1fr !important;
+      }
+
+      .formal-header, .kpi-row, .charts-row, .panel-card, .batch-item-card {
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Loading Overlay -->
+  <div id="loaderScreen">
+    <div class="spinner"></div>
+    <div id="loaderMsg" style="font-weight: 600; font-size: 0.95rem;">กำลังซิงค์ข้อมูลสดจาก Google Sheet ผ่าน JSONP...</div>
+  </div>
+
+  <!-- 1. Screen Top Navbar -->
+  <header class="top-navbar">
+    <div class="brand-group">
+      <img
+        id="mainLogoImg"
+        src="https://oa-profile-media.line-scdn.net/0h6S0hvefpaXwNEXaa2LAWK1hOZw0-czB4anYkT3R5MjNWZGVWVxBvZXRDax5rIW54RBd6T10RbTd_RSZWVzZhSF1MdRxVQStWMhR5Zlp6di1FUQ"
+        alt="B-Quik Logo"
+        class="brand-logo"
+        onerror="this.style.display='none'; document.getElementById('navLogoFallback').style.display='inline-block';"
+      >
+      <div id="navLogoFallback" class="brand-fallback">B-QUIK</div>
+      <div class="brand-text">
+        <h1>EXECUTIVE TRAINING ANALYTICS : THE QUICK RECOVERY</h1>
+        <p>ระบบรายงานผลการประเมินหลังการอบรม (Live Sync via Google Apps Script JSONP)</p>
+      </div>
+    </div>
+
+    <div class="toolbar-actions">
+      <button class="btn btn-ghost" onclick="fetchDataViaJSONP()">
+        <i class="fa-solid fa-arrows-rotate"></i> Refresh ข้อมูล
+      </button>
+      <button class="btn btn-outline-yellow" onclick="printSingleMode()">
+        <i class="fa-solid fa-file-pdf"></i> เซฟ PDF เฉพาะแท็บที่เลือก
+      </button>
+      <button class="btn btn-yellow" onclick="printAllMode()">
+        <i class="fa-solid fa-copy"></i> เซฟ PDF รวมทั้งหมด (ขึ้นหน้าใหม่ทีละรุ่น)
+      </button>
+    </div>
+  </header>
+
+  <!-- 2. Benchmark Comparison Strip (Screen Only) -->
+  <section class="benchmark-strip">
+    <div class="benchmark-metrics">
+      <div class="bm-item">
+        <span class="bm-label"><i class="fa-solid fa-chart-line"></i> ค่าเฉลี่ยภาพรวมทุกรุ่น (Benchmark):</span>
+        <span class="bm-val" id="bmOverallAvg">0.00 / 12</span>
+      </div>
+      <div class="bm-item">
+        <span class="bm-label">กลุ่มที่กำลังดู:</span>
+        <span class="bm-val" id="bmCurrentName">ภาพรวมทั้งหมด</span>
+        <span class="bm-diff neutral" id="bmDiffBadge">0.00 (ฐานอ้างอิง)</span>
+      </div>
+      <div class="bm-item">
+        <span class="bm-label">อัตราผ่านเกณฑ์ (≥ 7 คะแนน):</span>
+        <span class="bm-val" id="bmPassCompare">0.0%</span>
+      </div>
+    </div>
+    <div class="sync-status">
+      <span class="dot-live"></span>
+      <span id="lastSyncText">ซิงค์ข้อมูลล่าสุด: -</span>
+    </div>
+  </section>
+
+  <!-- 3. Dynamic Tabs Bar (Screen Only) -->
+  <nav class="tabs-wrapper">
+    <div class="tabs-list" id="tabsContainer"></div>
+    <div style="font-size: 0.76rem; font-weight: 600; color: var(--bq-black);">
+      <i class="fa-solid fa-award" style="color: #D97706;"></i> เกณฑ์ผ่านมาตรฐาน: ≥ 7 / 12 คะแนน
+    </div>
+  </nav>
+
+  <!-- 4. Main A4 Report Workspace -->
+  <main id="reportWorkspace"></main>
+
+  <!-- 5. Modal for Employee Pass/Fail List -->
+  <div class="modal-overlay" id="empModal" onclick="if(event.target===this) closeEmpModal()">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div>
+          <h3 id="modalHeaderTitle" style="font-size: 0.98rem;">รายชื่อผู้เข้าทดสอบ</h3>
+          <p id="modalHeaderSub" style="font-size: 0.76rem; color: #D1D5DB;">-</p>
+        </div>
+        <button class="modal-close" onclick="closeEmpModal()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-content">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th style="width: 55px; text-align: center;">ลำดับ</th>
+              <th style="width: 110px;">รหัสพนักงาน</th>
+              <th>ชื่อจริง - นามสกุล</th>
+              <th style="width: 100px; text-align: center;">คะแนน</th>
+            </tr>
+          </thead>
+          <tbody id="modalTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // =========================================================================
+    // [ตั้งค่าหลัก] วางลิงก์ /exec ของ Google Apps Script Web App ตรงนี้
+    // =========================================================================
+    const APPS_SCRIPT_API_URL = 'https://script.google.com/macros/s/AKfycbzjOtcF8RVBIiYVJwCHDtyw5k-INoyXmtQkoovyRRFjHcyFrGt-pEvSKczojHhX-PTY/exec';
+    const LOGO_URL = 'https://oa-profile-media.line-scdn.net/0h6S0hvefpaXwNEXaa2LAWK1hOZw0-czB4anYkT3R5MjNWZGVWVxBvZXRDax5rIW54RBd6T10RbTd_RSZWVzZhSF1MdRxVQStWMhR5Zlp6di1FUQ';
+
+    let storeData = null;
+    let activeTab = 'ALL'; // 'ALL' หรือ เลขรุ่น 1, 2, 3...
+    let showAllQuestions = false;
+    let chartInstances = [];
+
+    window.onload = function () {
+      fetchDataViaJSONP();
+    };
+
+    /**
+     * ดึงข้อมูลสดจาก Google Apps Script ผ่าน JSONP (?callback=...) เพื่อข้ามข้อจำกัด CORS 100%
+     */
+    function fetchDataViaJSONP() {
+      const loader = document.getElementById('loaderScreen');
+      const loaderMsg = document.getElementById('loaderMsg');
+      loader.style.display = 'flex';
+      loaderMsg.innerText = 'กำลังซิงค์ข้อมูลสดจาก Google Sheet...';
+
+      if (!APPS_SCRIPT_API_URL || APPS_SCRIPT_API_URL.includes('[วางลิงก์')) {
+        loaderMsg.innerHTML = 'กรุณาระบุค่า <strong>APPS_SCRIPT_API_URL</strong> ในไฟล์ index.html ก่อนใช้งาน<br><small style="color:#D1D5DB;">นำลิงก์ /exec ที่ได้จากการ Deploy Google Apps Script มาวางแทนที่</small>';
+        return;
+      }
+
+      const callbackName = 'bqJsonpCallback_' + Date.now();
+      const scriptTag = document.createElement('script');
+
+      // ตั้งเวลา Timeout 15 วินาที กรณีลิงก์ผิดหรือสิทธิ์เข้าถึงไม่ถูกต้อง
+      const timeoutId = setTimeout(() => {
+        cleanupJsonp();
+        loaderMsg.innerHTML = 'การเชื่อมต่อใช้เวลานานเกินกำหนด กรุณาตรวจสอบลิงก์ /exec และสิทธิ์การแชร์ของ Apps Script<br><button class="btn btn-yellow" style="margin-top:12px;" onclick="fetchDataViaJSONP()">ลองใหม่อีกครั้ง</button>';
+      }, 15000);
+
+      function cleanupJsonp() {
+        clearTimeout(timeoutId);
+        if (window[callbackName]) delete window[callbackName];
+        if (scriptTag && scriptTag.parentNode) scriptTag.parentNode.removeChild(scriptTag);
+      }
+
+      window[callbackName] = function (response) {
+        cleanupJsonp();
+        storeData = response;
+        document.getElementById('lastSyncText').innerText = `ซิงค์ข้อมูลล่าสุด: ${storeData.generatedAt}`;
+        renderTabs();
+        updateBenchmarkStrip();
+        renderSingleWorkspace(activeTab);
+        loader.style.display = 'none';
+      };
+
+      const separator = APPS_SCRIPT_API_URL.includes('?') ? '&' : '?';
+      scriptTag.src = `${APPS_SCRIPT_API_URL}${separator}callback=${callbackName}&_ts=${Date.now()}`;
+      scriptTag.onerror = function () {
+        cleanupJsonp();
+        loaderMsg.innerHTML = 'ไม่สามารถโหลดสคริปต์จาก Apps Script ได้ กรุณาตรวจสอบว่า Deploy เป็น "ทุกคน (Anyone)" แล้ว<br><button class="btn btn-yellow" style="margin-top:12px;" onclick="fetchDataViaJSONP()">ลองใหม่อีกครั้ง</button>';
+      };
+
+      document.body.appendChild(scriptTag);
+    }
+
+    /**
+     * สร้างแถบแท็บ (Tabs) อัตโนมัติตามจำนวนรุ่นที่มีใน Sheet
+     */
+    function renderTabs() {
+      const container = document.getElementById('tabsContainer');
+      container.innerHTML = '';
+
+      const allTab = document.createElement('button');
+      allTab.className = 'tab-pill' + (activeTab === 'ALL' ? ' active' : '');
+      allTab.innerText = `ภาพรวมทั้งหมด (${storeData.records.length} คน)`;
+      allTab.onclick = () => switchTab('ALL');
+      container.appendChild(allTab);
+
+      storeData.batches.forEach(b => {
+        const count = storeData.records.filter(r => r.batchNumber === b.batchNumber).length;
+        const btn = document.createElement('button');
+        btn.className = 'tab-pill' + (activeTab === b.batchNumber ? ' active' : '');
+        btn.innerText = `${b.batchName} (${b.displayDate}) [${count}]`;
+        btn.onclick = () => switchTab(b.batchNumber);
+        container.appendChild(btn);
+      });
+    }
+
+    function switchTab(tabKey) {
+      activeTab = tabKey;
+      showAllQuestions = false;
+      renderTabs();
+      updateBenchmarkStrip();
+      renderSingleWorkspace(activeTab);
+    }
+
+    /**
+     * อัปเดตแถบ Benchmark ด้านบนสุดเพื่อเปรียบเทียบกลุ่มที่เลือกกับภาพรวมทั้งหมด
+     */
+    function updateBenchmarkStrip() {
+      if (!storeData) return;
+      const allRecs = storeData.records;
+      const maxS = storeData.maxScore || 12;
+      const passS = storeData.passScore || 7;
+
+      const overallAvg = allRecs.length > 0
+        ? allRecs.reduce((s, r) => s + r.score, 0) / allRecs.length
+        : 0;
+      const overallPassRate = allRecs.length > 0
+        ? (allRecs.filter(r => r.score >= passS).length / allRecs.length) * 100
+        : 0;
+
+      document.getElementById('bmOverallAvg').innerText = `${overallAvg.toFixed(2)} / ${maxS}`;
+
+      if (activeTab === 'ALL') {
+        document.getElementById('bmCurrentName').innerText = `ภาพรวมทั้งหมด (${storeData.batches.length} รุ่น)`;
+        const badge = document.getElementById('bmDiffBadge');
+        badge.className = 'bm-diff neutral';
+        badge.innerText = 'ฐานอ้างอิงหลัก (100%)';
+        document.getElementById('bmPassCompare').innerText = `${overallPassRate.toFixed(1)}%`;
+      } else {
+        const bObj = storeData.batches.find(b => b.batchNumber === activeTab);
+        const subRecs = allRecs.filter(r => r.batchNumber === activeTab);
+        const subAvg = subRecs.length > 0 ? subRecs.reduce((s, r) => s + r.score, 0) / subRecs.length : 0;
+        const subPassRate = subRecs.length > 0 ? (subRecs.filter(r => r.score >= passS).length / subRecs.length) * 100 : 0;
+        const diff = subAvg - overallAvg;
+
+        document.getElementById('bmCurrentName').innerText = `${bObj.batchName} (${subAvg.toFixed(2)} คะแนน)`;
+        const badge = document.getElementById('bmDiffBadge');
+        if (diff > 0.005) {
+          badge.className = 'bm-diff up';
+          badge.innerText = `+${diff.toFixed(2)} สูงกว่าค่าเฉลี่ยรวม`;
+        } else if (diff < -0.005) {
+          badge.className = 'bm-diff down';
+          badge.innerText = `${diff.toFixed(2)} ต่ำกว่าค่าเฉลี่ยรวม`;
+        } else {
+          badge.className = 'bm-diff neutral';
+          badge.innerText = 'เท่ากับค่าเฉลี่ยรวม';
+        }
+        document.getElementById('bmPassCompare').innerText = `${subPassRate.toFixed(1)}% (รวม ${overallPassRate.toFixed(1)}%)`;
+      }
+    }
+
+    /**
+     * ล้างกราฟเดิมก่อนวาดใหม่
+     */
+    function destroyAllCharts() {
+      chartInstances.forEach(c => c.destroy());
+      chartInstances = [];
+    }
+
+    /**
+     * แสดงผลหน้าเดียวบนหน้าจอ (ภาพรวม หรือ เฉพาะรุ่นที่เลือก)
+     */
+    function renderSingleWorkspace(tabKey) {
+      destroyAllCharts();
+      const workspace = document.getElementById('reportWorkspace');
+      workspace.innerHTML = '';
+
+      const pageEl = createReportPageElement(tabKey, false);
+      workspace.appendChild(pageEl.element);
+      pageEl.initCharts();
+    }
+
+    /**
+     * โหมดพิมพ์ PDF 1: เซฟเฉพาะแท็บที่กำลังเปิดดู
+     */
+    function printSingleMode() {
+      renderSingleWorkspace(activeTab);
+      setTimeout(() => window.print(), 250);
+    }
+
+    /**
+     * โหมดพิมพ์ PDF 2: เซฟรวมทั้งหมด โดยเรียงหน้าภาพรวม + ขึ้นหน้าใหม่ A4 ทีละรุ่นครบทุกรุ่น
+     */
+    function printAllMode() {
+      destroyAllCharts();
+      const workspace = document.getElementById('reportWorkspace');
+      workspace.innerHTML = '';
+
+      const pagesToRender = ['ALL', ...storeData.batches.map(b => b.batchNumber)];
+      const chartInitQueue = [];
+
+      pagesToRender.forEach(key => {
+        const pageObj = createReportPageElement(key, true);
+        workspace.appendChild(pageObj.element);
+        chartInitQueue.push(pageObj.initCharts);
+      });
+
+      chartInitQueue.forEach(fn => fn());
+
+      // สั่งพิมพ์แล้วคืนค่าหน้าจอกลับสู่แท็บเดิมหลังปิดหน้าต่าง Print
+      setTimeout(() => {
+        window.print();
+        setTimeout(() => renderSingleWorkspace(activeTab), 500);
+      }, 350);
+    }
+
+    /**
+     * สร้างบล็อกหน้ากระดาษ A4 (1 บล็อก = 1 กลุ่มรายงาน)
+     */
+    function createReportPageElement(tabKey, isBatchPrintAll) {
+      const maxS = storeData.maxScore || 12;
+      const passS = storeData.passScore || 7;
+      const allRecs = storeData.records;
+      const overallAvg = allRecs.length > 0 ? allRecs.reduce((s, r) => s + r.score, 0) / allRecs.length : 0;
+
+      const isAll = (tabKey === 'ALL');
+      const records = isAll ? allRecs : allRecs.filter(r => r.batchNumber === tabKey);
+      const batchObj = isAll ? null : storeData.batches.find(b => b.batchNumber === tabKey);
+
+      const scopeTitle = isAll
+        ? `ภาพรวมทั้งหมด (${storeData.batches.length} รุ่น)`
+        : `${batchObj.batchName} (${batchObj.displayDate})`;
+
+      // คำนวณสถิติหลัก
+      const total = records.length;
+      const sum = records.reduce((acc, r) => acc + r.score, 0);
+      const avg = total > 0 ? sum / total : 0;
+      const avgPct = (avg / maxS) * 100;
+      const passCnt = records.filter(r => r.score >= passS).length;
+      const failCnt = total - passCnt;
+      const passRate = total > 0 ? (passCnt / total) * 100 : 0;
+      const minS = total > 0 ? Math.min(...records.map(r => r.score)) : 0;
+      const maxVal = total > 0 ? Math.max(...records.map(r => r.score)) : 0;
+      const perfectCnt = records.filter(r => r.score === maxS).length;
+      const diffFromOverall = avg - overallAvg;
+
+      // คำนวณความแม่นยำรายข้อ (เรียงจากข้อที่ตอบถูกน้อยไปมาก เพื่อชี้จุดที่ควรทบทวน)
+      const qStats = storeData.questions.map((qText, idx) => {
+        const correct = records.reduce((acc, r) => acc + (r.itemResults[idx] || 0), 0);
+        const pct = total > 0 ? (correct / total) * 100 : 0;
+        return { index: idx + 1, title: qText.replace(/^\d+\.\s*/, ''), correct, total, pct };
+      });
+
+      const sortedWeakest = [...qStats].sort((a, b) => a.pct - b.pct);
+      const displayQuestions = (showAllQuestions || isBatchPrintAll) ? qStats : sortedWeakest.slice(0, 6);
+
+      // สร้าง HTML ของหน้ากระดาษ
+      const pageDiv = document.createElement('section');
+      pageDiv.className = 'a4-page-block';
+
+      const uid = `chart_${tabKey}_${Math.floor(Math.random() * 100000)}`;
+
+      // สร้าง HTML การ์ดสรุปรายรุ่น (แสดงเฉพาะหน้าภาพรวม 'ALL')
+      let batchOverviewHTML = '';
+      if (isAll) {
+        const cardsHTML = storeData.batches.map(b => {
+          const bRecs = allRecs.filter(r => r.batchNumber === b.batchNumber);
+          const n = bRecs.length;
+          const bAvg = n > 0 ? bRecs.reduce((s, r) => s + r.score, 0) / n : 0;
+          const bPass = bRecs.filter(r => r.score >= passS).length;
+          const bFail = n - bPass;
+          const bPassPct = n > 0 ? (bPass / n) * 100 : 0;
+
+          return `
+            <div class="batch-item-card">
+              <div class="bic-head">
+                <span>${b.batchName}</span>
+                <span class="bic-date">${b.displayDate}</span>
+              </div>
+              <div class="bic-body">
+                <div class="bic-row"><span>ผู้เข้าทดสอบ</span><strong>${n} คน</strong></div>
+                <div class="bic-row"><span>คะแนนเฉลี่ย</span><strong>${bAvg.toFixed(2)} / ${maxS}</strong></div>
+                <div class="bic-row bic-clickable" onclick="openEmpModal(${b.batchNumber}, 'PASS')" title="คลิกดูรายชื่อ">
+                  <span>ผ่านเกณฑ์ (≥${passS}) <i class="fa-solid fa-eye no-print" style="font-size:0.65rem; color:#6B7280;"></i></span>
+                  <strong style="color:#15803D;">${bPass} คน</strong>
+                </div>
+                <div class="bic-row bic-clickable" onclick="openEmpModal(${b.batchNumber}, 'FAIL')" title="คลิกดูรายชื่อ">
+                  <span>ไม่ผ่านเกณฑ์ (<${passS}) <i class="fa-solid fa-eye no-print" style="font-size:0.65rem; color:#6B7280;"></i></span>
+                  <strong style="color:${bFail > 0 ? '#B91C1C' : '#6B7280'};">${bFail} คน</strong>
+                </div>
+              </div>
+              <div class="bic-foot">
+                <div style="display:flex; justify-content:space-between; font-size:0.68rem; font-weight:700;">
+                  <span>อัตราผ่านเกณฑ์</span>
+                  <span style="color:#15803D;">${bPassPct.toFixed(1)}%</span>
+                </div>
+                <div class="bar-track"><div class="bar-fill" style="width:${bPassPct.toFixed(1)}%;"></div></div>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        batchOverviewHTML = `
+          <div class="panel-card">
+            <div class="panel-head">
+              <span><i class="fa-solid fa-layer-group"></i> สรุปผลประเมินแยกตามรุ่น (คลิกตัวเลขผ่าน/ไม่ผ่านเพื่อดูรายชื่อ)</span>
+              <span class="panel-tag">ทั้งหมด ${storeData.batches.length} รุ่น</span>
+            </div>
+            <div class="batch-grid">${cardsHTML}</div>
+          </div>
+        `;
+      } else {
+        // กรณีหน้ารายรุ่น แสดงสรุปรายชื่อผู้ไม่ผ่านเกณฑ์ (ถ้ามี) เพื่อให้ผู้จัดการติดตามผลได้ทันทีในหน้า PDF
+        const failList = records.filter(r => r.score < passS);
+        const failRows = failList.length > 0
+          ? failList.map((emp, i) => `<tr><td style="text-align:center;">${i + 1}</td><td><strong>${emp.empId || '-'}</strong></td><td>${emp.fullName || '-'}</td><td style="text-align:center; color:#B91C1C; font-weight:700;">${emp.score} / ${maxS}</td></tr>`).join('')
+          : `<tr><td colspan="4" style="text-align:center; color:#15803D; font-weight:600; padding:8px;">พนักงานรุ่นนี้สอบผ่านเกณฑ์ครบทั้ง 100%</td></tr>`;
+
+        batchOverviewHTML = `
+          <div class="panel-card">
+            <div class="panel-head">
+              <span><i class="fa-solid fa-user-check"></i> สรุปสถานะรายบุคคลใน ${batchObj.batchName}</span>
+              <span class="panel-tag no-print" style="cursor:pointer;" onclick="openEmpModal(${batchObj.batchNumber}, 'ALL')">ดูรายชื่อทั้งหมด (${total} คน)</span>
+            </div>
+            <table class="data-table" style="font-size:0.74rem;">
+              <thead>
+                <tr>
+                  <th style="width:50px; text-align:center;">ลำดับ</th>
+                  <th style="width:100px;">รหัสพนักงาน</th>
+                  <th>รายชื่อผู้ที่ต้องทบทวนเพิ่มเติม (คะแนน &lt; ${passS})</th>
+                  <th style="width:90px; text-align:center;">คะแนนที่ได้</th>
+                </tr>
+              </thead>
+              <tbody>${failRows}</tbody>
+            </table>
+          </div>
+        `;
+      }
+
+      // ปุ่มกดดูเพิ่มเติมสำหรับรายการหัวข้อคำถาม (แสดง 6 รายการแรก พร้อมปุ่มสลับดูครบ 12 ข้อ)
+      const toggleBtnHTML = (!isBatchPrintAll && qStats.length > 6)
+        ? `<button class="btn btn-outline-yellow no-print" style="padding:2px 8px; font-size:0.68rem; color:#141416; border-color:#141416;" onclick="toggleQuestionList()">
+            ${showAllQuestions ? 'ย่อเหลือ 6 ข้อที่ควรทบทวน' : `ดูเพิ่มเติมครบทั้ง ${qStats.length} ข้อ`}
+           </button>`
+        : '';
+
+      const questionsHTML = displayQuestions.map(q => {
+        const barClass = q.pct < 70 ? 'q-fill-low' : (q.pct >= 85 ? 'q-fill-high' : 'q-fill-mid');
+        return `
+          <div class="q-metric-row">
+            <div class="q-metric-title" title="ข้อ ${q.index}: ${q.title}">
+              <strong>ข้อ ${q.index}:</strong> ${q.title}
+            </div>
+            <div class="q-metric-bar">
+              <div class="bar-track" style="margin-top:0;"><div class="bar-fill ${barClass}" style="width:${q.pct.toFixed(1)}%;"></div></div>
+              <span style="width:36px; text-align:right; font-weight:700;">${q.pct.toFixed(0)}%</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      pageDiv.innerHTML = `
+        <!-- Formal Header (ปรากฏชัดเจนตอนพิมพ์ PDF) -->
+        <div class="formal-header">
+          <div class="fh-left">
+            <img src="${LOGO_URL}" alt="B-Quik" class="fh-logo" onerror="this.style.display='none';">
+            <div class="fh-title">
+              <h2>POST-TEST EXECUTIVE REPORT : THE QUICK RECOVERY</h2>
+              <p>รายงานสรุปผลการประเมินความรู้หลังการอบรม | B-Quik Training & Development</p>
+            </div>
+          </div>
+          <div class="fh-right">
+            <div class="fh-badge">${scopeTitle}</div>
+            <div class="fh-meta">เกณฑ์ผ่าน: ≥ ${passS}/${maxS} คะแนน | พิมพ์เมื่อ: ${storeData.generatedAt}</div>
+          </div>
+        </div>
+
+        <!-- KPI Summary Cards -->
+        <div class="kpi-row">
+          <div class="kpi-box highlight">
+            <div class="kpi-title">ผู้เข้าทดสอบทั้งหมด</div>
+            <div class="kpi-num">${total} คน</div>
+            <div class="kpi-foot">${scopeTitle}</div>
+          </div>
+          <div class="kpi-box">
+            <div class="kpi-title">คะแนนเฉลี่ย (เต็ม ${maxS})</div>
+            <div class="kpi-num">${avg.toFixed(2)}</div>
+            <div class="kpi-foot">${isAll ? `คิดเป็น ${avgPct.toFixed(1)}%` : `เทียบภาพรวม: ${diffFromOverall >= 0 ? '+' : ''}${diffFromOverall.toFixed(2)}`}</div>
+          </div>
+          <div class="kpi-box">
+            <div class="kpi-title">อัตราการสอบผ่าน (≥${passS})</div>
+            <div class="kpi-num" style="color:#15803D;">${passRate.toFixed(1)}%</div>
+            <div class="kpi-foot">ผ่าน ${passCnt} / ไม่ผ่าน ${failCnt} คน</div>
+          </div>
+          <div class="kpi-box">
+            <div class="kpi-title">คะแนนสูงสุด / ต่ำสุด</div>
+            <div class="kpi-num">${total > 0 ? `${maxVal} / ${minS}` : '0 / 0'}</div>
+            <div class="kpi-foot">ได้คะแนนเต็ม (${maxS}/${maxS}): ${perfectCnt} คน</div>
+          </div>
+        </div>
+
+        <!-- Visual Charts -->
+        <div class="charts-row">
+          <div class="panel-card">
+            <div class="panel-head">
+              <span><i class="fa-solid fa-chart-column"></i> คะแนนเฉลี่ยเปรียบเทียบรายรุ่น</span>
+              <span class="panel-tag">Benchmark ${overallAvg.toFixed(2)}</span>
+            </div>
+            <div class="chart-wrap"><canvas id="${uid}_batch"></canvas></div>
+          </div>
+          <div class="panel-card">
+            <div class="panel-head">
+              <span><i class="fa-solid fa-chart-bar"></i> การกระจายตัวของคะแนน (0 - ${maxS})</span>
+              <span class="panel-tag">เกณฑ์ผ่าน ≥ ${passS}</span>
+            </div>
+            <div class="chart-wrap"><canvas id="${uid}_dist"></canvas></div>
+          </div>
+        </div>
+
+        <!-- Batch Cards or Individual Follow-up Table -->
+        ${batchOverviewHTML}
+
+        <!-- Question Summary (6 Weakest Items + Expand Button) -->
+        <div class="panel-card">
+          <div class="panel-head">
+            <span><i class="fa-solid fa-bullseye"></i> ${showAllQuestions || isBatchPrintAll ? `ความแม่นยำรายหัวข้อครบทั้ง ${qStats.length} ข้อ` : 'สรุป 6 หัวข้อที่ควรเน้นย้ำเพิ่มเติม (เรียงจากความแม่นยำน้อยสุด)'}</span>
+            ${toggleBtnHTML}
+          </div>
+          <div class="item-grid-2col">${questionsHTML}</div>
+        </div>
+
+        <!-- Formal Footer -->
+        <div class="formal-footer">
+          <span>เอกสารสรุปผลภายในองค์กร | B-Quik Co., Ltd. (The Quick Recovery)</span>
+          <span>ขอบเขตข้อมูล: ${scopeTitle}</span>
+        </div>
+      `;
+
+      // ฟังก์ชันวาดกราฟประจำหน้านั้นๆ
+      const initCharts = () => {
+        const ctxBatch = document.getElementById(`${uid}_batch`).getContext('2d');
+        const batchLabels = storeData.batches.map(b => `${b.batchName} (${b.displayDate.slice(0, -5)})`);
+        const batchAvgs = storeData.batches.map(b => {
+          const rList = allRecs.filter(r => r.batchNumber === b.batchNumber);
+          return rList.length > 0 ? Number((rList.reduce((s, r) => s + r.score, 0) / rList.length).toFixed(2)) : 0;
+        });
+        const barBg = storeData.batches.map(b => (isAll || b.batchNumber === tabKey) ? '#FFD100' : '#E5E7EB');
+
+        const c1 = new Chart(ctxBatch, {
+          type: 'bar',
+          data: {
+            labels: batchLabels,
+            datasets: [{
+              label: 'คะแนนเฉลี่ย',
+              data: batchAvgs,
+              backgroundColor: barBg,
+              borderColor: '#141416',
+              borderWidth: 1.5,
+              borderRadius: 4
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: false,
+            scales: {
+              y: { beginAtZero: true, max: maxS, ticks: { stepSize: 3, font: { size: 9 } } },
+              x: { ticks: { font: { size: storeData.batches.length > 6 ? 7.5 : 8.5 } } }
+            },
+            plugins: { legend: { display: false } }
+          }
+        });
+
+        const ctxDist = document.getElementById(`${uid}_dist`).getContext('2d');
+        const distLabels = [];
+        const distCounts = [];
+        const distColors = [];
+        for (let s = 0; s <= maxS; s++) {
+          distLabels.push(`${s}`);
+          distCounts.push(records.filter(r => r.score === s).length);
+          distColors.push(s >= passS ? '#141416' : '#DC2626');
+        }
+
+        const c2 = new Chart(ctxDist, {
+          type: 'bar',
+          data: {
+            labels: distLabels,
+            datasets: [{
+              label: 'จำนวนคน',
+              data: distCounts,
+              backgroundColor: distColors,
+              borderColor: '#FFD100',
+              borderWidth: 1,
+              borderRadius: 3
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: false,
+            scales: {
+              y: { beginAtZero: true, ticks: { precision: 0, font: { size: 9 } } },
+              x: { ticks: { font: { size: 8.5 } } }
+            },
+            plugins: { legend: { display: false } }
+          }
+        });
+
+        chartInstances.push(c1, c2);
+      };
+
+      return { element: pageDiv, initCharts };
+    }
+
+    function toggleQuestionList() {
+      showAllQuestions = !showAllQuestions;
+      renderSingleWorkspace(activeTab);
+    }
+
+    /**
+     * เปิดหน้าต่างป๊อปอัปแสดงรายชื่อพนักงาน (ผ่านเกณฑ์ / ไม่ผ่านเกณฑ์ / ทั้งหมด)
+     */
+    function openEmpModal(batchNum, mode) {
+      if (!storeData) return;
+      const bObj = storeData.batches.find(b => b.batchNumber === batchNum);
+      if (!bObj) return;
+
+      const passS = storeData.passScore || 7;
+      const maxS = storeData.maxScore || 12;
+      const bRecs = storeData.records.filter(r => r.batchNumber === batchNum);
+
+      let list = bRecs;
+      let label = 'รายชื่อผู้เข้าทดสอบทั้งหมด';
+      if (mode === 'PASS') {
+        list = bRecs.filter(r => r.score >= passS);
+        label = `รายชื่อผู้ผ่านเกณฑ์ (≥ ${passS} คะแนน)`;
+      } else if (mode === 'FAIL') {
+        list = bRecs.filter(r => r.score < passS);
+        label = `รายชื่อผู้ไม่ผ่านเกณฑ์ (< ${passS} คะแนน)`;
+      }
+
+      list.sort((a, b) => b.score - a.score);
+
+      document.getElementById('modalHeaderTitle').innerText = `${bObj.batchName} (${bObj.displayDate}) - ${label}`;
+      document.getElementById('modalHeaderSub').innerText = `จำนวนทั้งหมด ${list.length} คน`;
+
+      const tbody = document.getElementById('modalTableBody');
+      tbody.innerHTML = list.length === 0
+        ? `<tr><td colspan="4" style="text-align:center; padding:18px; color:#6B7280;">ไม่มีรายชื่อในกลุ่มนี้</td></tr>`
+        : list.map((emp, idx) => {
+            const isPass = emp.score >= passS;
+            return `
+              <tr>
+                <td style="text-align:center;">${idx + 1}</td>
+                <td><strong>${emp.empId || '-'}</strong></td>
+                <td>${emp.fullName || '-'}</td>
+                <td style="text-align:center;">
+                  <span class="pill-status ${isPass ? 'pill-pass' : 'pill-fail'}">${emp.score} / ${maxS}</span>
+                </td>
+              </tr>
+            `;
+          }).join('');
+
+      document.getElementById('empModal').style.display = 'flex';
+    }
+
+    function closeEmpModal() {
+      document.getElementById('empModal').style.display = 'none';
+    }
+  </script>
+</body>
+</html>
