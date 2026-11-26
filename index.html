@@ -151,35 +151,43 @@
       gap: 18px;
     }
 
-    /* ================= FILTER & BENCHMARK BAR ================= */
+    /* ================= FILTER & BENCHMARK BAR (UPGRADED) ================= */
     .control-panel {
       background: var(--bq-white);
-      padding: 14px 18px;
+      padding: 16px 20px;
       border-radius: 12px;
       box-shadow: var(--shadow-sm);
       border: 1px solid var(--bq-border);
       display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .control-top-row {
+      display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 14px;
       flex-wrap: wrap;
+      gap: 10px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #F1F5F9;
     }
 
+    .filter-label {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--bq-black);
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    /* Desktop Wrap Pills - แสดงครบทุกรุ่นโดยไม่เกิดแถบเลื่อน */
     .batch-tabs {
       display: flex;
+      flex-wrap: wrap;
       gap: 8px;
-      overflow-x: auto;
-      padding-bottom: 2px;
-      scrollbar-width: thin;
-      max-width: 100%;
-    }
-
-    .batch-tabs::-webkit-scrollbar {
-      height: 4px;
-    }
-    .batch-tabs::-webkit-scrollbar-thumb {
-      background: #CBD5E1;
-      border-radius: 4px;
+      width: 100%;
     }
 
     .tab-btn {
@@ -189,9 +197,8 @@
       background: #F8FAFC;
       color: var(--bq-black);
       font-weight: 600;
-      font-size: 0.83rem;
+      font-size: 0.82rem;
       cursor: pointer;
-      white-space: nowrap;
       transition: all 0.15s ease;
     }
 
@@ -204,20 +211,44 @@
       background: var(--bq-black);
       color: var(--bq-yellow);
       border-color: var(--bq-black);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+    }
+
+    /* Mobile Select Dropdown - ซ่อนบนคอมพิวเตอร์ แสดงเฉพาะบนมือถือ */
+    .mobile-select-wrapper {
+      display: none;
+      width: 100%;
+    }
+
+    .batch-select {
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: 1.5px solid var(--bq-black);
+      background-color: #F8FAFC;
+      color: var(--bq-black);
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      outline: none;
+    }
+
+    .batch-select:focus {
+      border-color: var(--bq-yellow-hover);
+      background-color: var(--bq-white);
     }
 
     .benchmark-pill {
       background: var(--bq-yellow-light);
       border: 1px solid #FDE68A;
-      padding: 7px 14px;
+      padding: 6px 14px;
       border-radius: 8px;
       font-size: 0.82rem;
       font-weight: 600;
       color: var(--bq-black);
-      display: flex;
+      display: inline-flex;
       align-items: center;
       gap: 8px;
-      white-space: nowrap;
     }
 
     /* ================= REPORT SHEET ================= */
@@ -688,6 +719,13 @@
         font-size: 0.8rem;
         padding: 8px 10px;
       }
+      /* บนมือถือ ซ่อนปุ่มแท็บ แล้วแสดง Dropdown แทน */
+      .batch-tabs {
+        display: none;
+      }
+      .mobile-select-wrapper {
+        display: block;
+      }
       .report-container {
         padding: 16px;
       }
@@ -788,10 +826,22 @@
 
     <!-- Filter & Benchmark Bar -->
     <div class="control-panel">
+      <div class="control-top-row">
+        <div class="filter-label">
+          <i class="fa-solid fa-filter"></i> เลือกขอบเขตข้อมูลที่ต้องการดู:
+        </div>
+        <div class="benchmark-pill">
+          <i class="fa-solid fa-award" style="color:#B45309;"></i>
+          <span>เกณฑ์ผ่านมาตรฐาน: <strong>≥ 7 / 12 คะแนน</strong></span>
+        </div>
+      </div>
+
+      <!-- Desktop: ปุ่มจัดเรียงขึ้นบรรทัดใหม่อัตโนมัติ (เห็นครบทุกรุ่น) -->
       <div class="batch-tabs" id="batchTabsContainer"></div>
-      <div class="benchmark-pill">
-        <i class="fa-solid fa-award" style="color:#B45309;"></i>
-        <span>เกณฑ์ผ่านมาตรฐาน: <strong>≥ 7 / 12 คะแนน</strong></span>
+
+      <!-- Mobile: เมนู Dropdown เลือกง่ายไม่ล้นจอ -->
+      <div class="mobile-select-wrapper">
+        <select class="batch-select" id="batchMobileSelect" onchange="handleMobileSelectChange(this.value)"></select>
       </div>
     </div>
 
@@ -923,14 +973,13 @@
       loadData();
     };
 
-    // ดึงข้อมูลผ่าน JSONP เพื่อรองรับ GitHub Pages
     function loadData() {
       document.getElementById('loader').style.display = 'flex';
       const callbackName = 'bqCallback_' + Date.now();
 
       window[callbackName] = function(data) {
         appData = data;
-        buildTabs();
+        buildFilterControls();
         renderReport();
         document.getElementById('loader').style.display = 'none';
         delete window[callbackName];
@@ -947,29 +996,56 @@
       document.body.appendChild(script);
     }
 
-    function buildTabs() {
+    function buildFilterControls() {
       const container = document.getElementById('batchTabsContainer');
+      const mobileSelect = document.getElementById('batchMobileSelect');
       container.innerHTML = '';
+      mobileSelect.innerHTML = '';
 
+      // 1. สร้างตัวเลือก "ภาพรวมทุกรุ่น"
       const allBtn = document.createElement('button');
       allBtn.className = 'tab-btn' + (selectedBatch === 'ALL' ? ' active' : '');
       allBtn.innerText = `ภาพรวมทุกรุ่น (${appData.records.length} คน)`;
-      allBtn.onclick = () => { selectedBatch = 'ALL'; buildTabs(); renderReport(); };
+      allBtn.onclick = () => selectBatch('ALL');
       container.appendChild(allBtn);
 
+      const allOpt = document.createElement('option');
+      allOpt.value = 'ALL';
+      allOpt.innerText = `ภาพรวมทุกรุ่น (${appData.records.length} คน)`;
+      if (selectedBatch === 'ALL') allOpt.selected = true;
+      mobileSelect.appendChild(allOpt);
+
+      // 2. สร้างตัวเลือกรายรุ่น
       appData.batches.forEach(b => {
+        const labelText = `${b.batchName} (${b.displayDate})`;
+
         const btn = document.createElement('button');
         btn.className = 'tab-btn' + (selectedBatch === b.batchNumber ? ' active' : '');
-        btn.innerText = `${b.batchName} (${b.displayDate})`;
-        btn.onclick = () => { selectedBatch = b.batchNumber; buildTabs(); renderReport(); };
+        btn.innerText = labelText;
+        btn.onclick = () => selectBatch(b.batchNumber);
         container.appendChild(btn);
+
+        const opt = document.createElement('option');
+        opt.value = b.batchNumber;
+        opt.innerText = labelText;
+        if (selectedBatch === b.batchNumber) opt.selected = true;
+        mobileSelect.appendChild(opt);
       });
+    }
+
+    function selectBatch(batchVal) {
+      selectedBatch = batchVal;
+      buildFilterControls();
+      renderReport();
+    }
+
+    function handleMobileSelectChange(val) {
+      selectBatch(val === 'ALL' ? 'ALL' : Number(val));
     }
 
     function renderReport() {
       if (!appData) return;
 
-      // คำนวณ Benchmark ภาพรวมทุกรุ่น
       const allTotal = appData.records.length;
       const allSum = appData.records.reduce((acc, r) => acc + r.score, 0);
       const overallAvg = allTotal > 0 ? (allSum / allTotal).toFixed(2) : '0.00';
@@ -987,7 +1063,6 @@
       document.getElementById('reportScopeBadge').innerText = scopeText;
       document.getElementById('footerTimestamp').innerText = `อัปเดตข้อมูลล่าสุด: ${appData.generatedAt}`;
 
-      // คำนวณ KPI ของกลุ่มที่เลือก
       const total = records.length;
       const sum = records.reduce((acc, r) => acc + r.score, 0);
       const avg = total > 0 ? sum / total : 0;
