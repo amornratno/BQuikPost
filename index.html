@@ -13,6 +13,7 @@
       --bq-yellow: #FFD100;
       --bq-yellow-hover: #F2C200;
       --bq-yellow-light: #FFFBEB;
+      --bq-yellow-border: #FDE68A;
       --bq-black: #111111;
       --bq-dark-gray: #222222;
       --bq-mid-gray: #64748B;
@@ -32,6 +33,8 @@
       margin: 0;
       padding: 0;
       font-family: 'Prompt', sans-serif;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
     }
 
     body {
@@ -151,7 +154,7 @@
       gap: 18px;
     }
 
-    /* ================= FILTER & BENCHMARK BAR (UPGRADED) ================= */
+    /* ================= FILTER & BENCHMARK BAR ================= */
     .control-panel {
       background: var(--bq-white);
       padding: 16px 20px;
@@ -182,7 +185,6 @@
       gap: 7px;
     }
 
-    /* Desktop Wrap Pills - แสดงครบทุกรุ่นโดยไม่เกิดแถบเลื่อน */
     .batch-tabs {
       display: flex;
       flex-wrap: wrap;
@@ -214,7 +216,6 @@
       box-shadow: 0 2px 6px rgba(0,0,0,0.12);
     }
 
-    /* Mobile Select Dropdown - ซ่อนบนคอมพิวเตอร์ แสดงเฉพาะบนมือถือ */
     .mobile-select-wrapper {
       display: none;
       width: 100%;
@@ -233,14 +234,9 @@
       outline: none;
     }
 
-    .batch-select:focus {
-      border-color: var(--bq-yellow-hover);
-      background-color: var(--bq-white);
-    }
-
     .benchmark-pill {
       background: var(--bq-yellow-light);
-      border: 1px solid #FDE68A;
+      border: 1px solid var(--bq-yellow-border);
       padding: 6px 14px;
       border-radius: 8px;
       font-size: 0.82rem;
@@ -263,7 +259,6 @@
       gap: 22px;
     }
 
-    /* Report Header */
     .report-header {
       background: linear-gradient(135deg, #111111 0%, #262626 100%);
       color: var(--bq-white);
@@ -339,7 +334,6 @@
       border-top: 4px solid var(--bq-yellow);
       border-radius: 10px;
       padding: 14px 16px;
-      transition: transform 0.15s ease;
     }
 
     .kpi-card.highlight {
@@ -535,6 +529,68 @@
       border-radius: 6px;
     }
 
+    /* ================= ROSTER TABLE (ตารางรายชื่อและคะแนนในแต่ละรุ่น) ================= */
+    .roster-section {
+      display: none;
+      flex-direction: column;
+    }
+
+    .roster-table-wrapper {
+      width: 100%;
+      overflow-x: auto;
+      border: 1px solid var(--bq-border);
+      border-radius: 10px;
+    }
+
+    .roster-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      background: var(--bq-white);
+    }
+
+    .roster-table thead th {
+      background: var(--bq-black);
+      color: var(--bq-yellow);
+      padding: 10px 12px;
+      text-align: left;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .roster-table tbody td {
+      padding: 9px 12px;
+      border-bottom: 1px solid #F1F5F9;
+      color: var(--bq-black);
+    }
+
+    .roster-table tbody tr:nth-child(even) {
+      background: #F8FAFC;
+    }
+
+    .roster-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 99px;
+      font-weight: 700;
+      font-size: 0.76rem;
+      white-space: nowrap;
+    }
+
+    .status-badge.pass {
+      background: var(--pass-bg);
+      color: var(--pass-green);
+    }
+
+    .status-badge.fail {
+      background: var(--fail-bg);
+      color: var(--fail-red);
+    }
+
     /* Footer */
     .report-footer {
       padding-top: 12px;
@@ -719,7 +775,6 @@
         font-size: 0.8rem;
         padding: 8px 10px;
       }
-      /* บนมือถือ ซ่อนปุ่มแท็บ แล้วแสดง Dropdown แทน */
       .batch-tabs {
         display: none;
       }
@@ -745,20 +800,27 @@
       .batch-cards-grid {
         grid-template-columns: 1fr;
       }
+      .roster-table {
+        font-size: 0.78rem;
+      }
+      .roster-table thead th,
+      .roster-table tbody td {
+        padding: 8px 8px;
+      }
     }
 
     /* ================= PRINT / PDF RULES ================= */
     @media print {
       @page {
         size: A4 portrait;
-        margin: 10mm;
+        margin: 10mm 11mm;
       }
       body {
         background: #FFFFFF !important;
-        -webkit-print-color-adjust: exact !important;
-        print-color-adjust: exact !important;
+        font-size: 11px !important;
+        line-height: 1.4 !important;
       }
-      .navbar, .control-panel, #loader, .modal-backdrop, .click-hint {
+      .navbar, .control-panel, #loader, .modal-backdrop, .click-hint, .hint-tag {
         display: none !important;
       }
       .main-wrapper {
@@ -770,18 +832,75 @@
         box-shadow: none !important;
         border: none !important;
         padding: 0 !important;
+        gap: 12px !important;
+      }
+      .report-header {
+        padding: 12px 16px !important;
+        border-radius: 8px !important;
+        break-inside: avoid !important;
+      }
+      .report-logo {
+        height: 44px !important;
+      }
+      .report-header h2 {
+        font-size: 14px !important;
       }
       .kpi-grid {
         grid-template-columns: repeat(4, 1fr) !important;
+        gap: 8px !important;
+        break-inside: avoid !important;
+      }
+      .kpi-card {
+        padding: 9px 11px !important;
+      }
+      .kpi-value {
+        font-size: 18px !important;
       }
       .charts-grid {
         grid-template-columns: 1fr 1fr !important;
+        gap: 10px !important;
+        break-inside: avoid !important;
+      }
+      .chart-container {
+        height: 165px !important;
       }
       .batch-cards-grid {
         grid-template-columns: repeat(3, 1fr) !important;
+        gap: 8px !important;
       }
-      .report-header, .kpi-grid, .charts-grid, .batch-card {
+      .batch-cards-grid.single-mode {
+        grid-template-columns: 1fr !important;
+      }
+      .batch-card {
         break-inside: avoid !important;
+      }
+      .roster-section {
+        break-inside: auto !important;
+      }
+      .roster-table-wrapper {
+        overflow: visible !important;
+        border: 1px solid #CBD5E1 !important;
+      }
+      .roster-table {
+        font-size: 10px !important;
+      }
+      .roster-table thead {
+        display: table-header-group !important;
+      }
+      .roster-table thead th {
+        padding: 6px 8px !important;
+      }
+      .roster-table tbody tr {
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+      }
+      .roster-table tbody td {
+        padding: 5px 8px !important;
+        border-bottom: 1px solid #E2E8F0 !important;
+      }
+      .status-badge {
+        font-size: 9px !important;
+        padding: 1px 7px !important;
       }
     }
   </style>
@@ -836,10 +955,10 @@
         </div>
       </div>
 
-      <!-- Desktop: ปุ่มจัดเรียงขึ้นบรรทัดใหม่อัตโนมัติ (เห็นครบทุกรุ่น) -->
+      <!-- Desktop: ปุ่มจัดเรียงขึ้นบรรทัดใหม่อัตโนมัติ -->
       <div class="batch-tabs" id="batchTabsContainer"></div>
 
-      <!-- Mobile: เมนู Dropdown เลือกง่ายไม่ล้นจอ -->
+      <!-- Mobile: เมนู Dropdown -->
       <div class="mobile-select-wrapper">
         <select class="batch-select" id="batchMobileSelect" onchange="handleMobileSelectChange(this.value)"></select>
       </div>
@@ -922,6 +1041,28 @@
         <div class="batch-cards-grid" id="batchCardsContainer"></div>
       </div>
 
+      <!-- Batch Roster & Score Table (แสดงอัตโนมัติเมื่อเลือกดูรายรุ่น ทั้งบนเว็บและ PDF) -->
+      <div class="roster-section" id="batchRosterSection">
+        <div class="section-header-bar">
+          <span id="rosterSectionTitle"><i class="fa-solid fa-users"></i> รายชื่อและผลคะแนนผู้เข้าทดสอบ</span>
+          <span class="hint-tag" id="rosterCountTag">0 คน</span>
+        </div>
+        <div class="roster-table-wrapper">
+          <table class="roster-table">
+            <thead>
+              <tr>
+                <th style="width: 55px; text-align: center;">ลำดับ</th>
+                <th style="width: 125px;">รหัสพนักงาน</th>
+                <th>ชื่อจริง - นามสกุล</th>
+                <th style="width: 105px; text-align: center;">คะแนนที่ได้</th>
+                <th style="width: 115px; text-align: center;">ผลการประเมิน</th>
+              </tr>
+            </thead>
+            <tbody id="rosterTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
       <!-- Footer -->
       <div class="report-footer">
         <span>B-Quik Training & Development | หลักสูตร The Quick Recovery</span>
@@ -960,7 +1101,7 @@
   </div>
 
   <script>
-    // *** ใส่ Web App URL จาก Google Apps Script ของคุณตรงนี้ ***
+    // *** ใส่ Web App URL จาก Google Apps Script ของโปรเจกต์ Post-Training ตรงนี้ ***
     const API_URL = 'https://script.google.com/macros/s/AKfycbzjOtcF8RVBIiYVJwCHDtyw5k-INoyXmtQkoovyRRFjHcyFrGt-pEvSKczojHhX-PTY/exec';
 
     const PASS_SCORE = 7;
@@ -988,9 +1129,10 @@
 
       const script = document.createElement('script');
       script.id = callbackName;
-      script.src = `${API_URL}?callback=${callbackName}`;
+      const sep = API_URL.includes('?') ? '&' : '?';
+      script.src = `${API_URL}${sep}callback=${callbackName}&t=${Date.now()}`;
       script.onerror = function() {
-        alert('ไม่สามารถเชื่อมต่อฐานข้อมูลได้ กรุณาตรวจสอบลิงก์ API หรือการตั้งค่าสิทธิ์เข้าถึง');
+        alert('ไม่สามารถเชื่อมต่อฐานข้อมูลได้ กรุณาลองใหม่อีกครั้ง');
         document.getElementById('loader').style.display = 'none';
       };
       document.body.appendChild(script);
@@ -1002,7 +1144,6 @@
       container.innerHTML = '';
       mobileSelect.innerHTML = '';
 
-      // 1. สร้างตัวเลือก "ภาพรวมทุกรุ่น"
       const allBtn = document.createElement('button');
       allBtn.className = 'tab-btn' + (selectedBatch === 'ALL' ? ' active' : '');
       allBtn.innerText = `ภาพรวมทุกรุ่น (${appData.records.length} คน)`;
@@ -1015,7 +1156,6 @@
       if (selectedBatch === 'ALL') allOpt.selected = true;
       mobileSelect.appendChild(allOpt);
 
-      // 2. สร้างตัวเลือกรายรุ่น
       appData.batches.forEach(b => {
         const labelText = `${b.batchName} (${b.displayDate})`;
 
@@ -1085,6 +1225,7 @@
 
       renderCharts(records);
       renderBatchCards();
+      renderBatchRoster(records);
     }
 
     function renderCharts(records) {
@@ -1115,6 +1256,7 @@
         options: {
           responsive: true,
           maintainAspectRatio: false,
+          animation: false,
           scales: {
             y: { beginAtZero: true, max: 12, ticks: { stepSize: 3 } }
           },
@@ -1147,6 +1289,7 @@
         options: {
           responsive: true,
           maintainAspectRatio: false,
+          animation: false,
           scales: {
             y: { beginAtZero: true, ticks: { precision: 0 } },
             x: {
@@ -1227,6 +1370,51 @@
       });
     }
 
+    // แสดงตารางรายชื่อและคะแนนผู้เข้าทดสอบเมื่อเลือกดูรายรุ่น (ทั้งบนหน้าเว็บและ PDF)
+    function renderBatchRoster(records) {
+      const rosterSection = document.getElementById('batchRosterSection');
+      const tbody = document.getElementById('rosterTableBody');
+
+      if (selectedBatch === 'ALL') {
+        rosterSection.style.display = 'none';
+        tbody.innerHTML = '';
+        return;
+      }
+
+      const bObj = appData.batches.find(b => b.batchNumber === selectedBatch);
+      document.getElementById('rosterSectionTitle').innerHTML =
+        `<i class="fa-solid fa-users"></i> รายชื่อและผลคะแนนผู้เข้าทดสอบ — ${bObj ? bObj.batchName : ''} (${bObj ? bObj.displayDate : ''})`;
+      document.getElementById('rosterCountTag').innerText = `ทั้งหมด ${records.length} คน`;
+
+      // เรียงคะแนนจากมากไปน้อย และหากคะแนนเท่ากันเรียงตามรหัสพนักงาน
+      const sortedRecords = [...records].sort((a, b) => {
+        if (b.score !== a.score) return b.score - a.score;
+        return String(a.empId || '').localeCompare(String(b.empId || ''));
+      });
+
+      tbody.innerHTML = '';
+      if (sortedRecords.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:20px; color:#64748B;">ไม่มีข้อมูลผู้เข้าทดสอบในรุ่นนี้</td></tr>`;
+      } else {
+        sortedRecords.forEach((emp, idx) => {
+          const isPass = emp.score >= PASS_SCORE;
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td style="text-align: center;">${idx + 1}</td>
+            <td><strong>${escapeHtml(emp.empId || '-')}</strong></td>
+            <td>${escapeHtml(emp.fullName || '-')}</td>
+            <td style="text-align: center; font-weight: 700;">${emp.score} / 12</td>
+            <td style="text-align: center;">
+              <span class="status-badge ${isPass ? 'pass' : 'fail'}">${isPass ? 'ผ่านเกณฑ์' : 'ไม่ผ่านเกณฑ์'}</span>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      rosterSection.style.display = 'flex';
+    }
+
     function openStatusModal(batchNum, statusType) {
       if (!appData) return;
       const bObj = appData.batches.find(b => b.batchNumber === batchNum);
@@ -1257,8 +1445,8 @@
           const tr = document.createElement('tr');
           tr.innerHTML = `
             <td style="text-align:center;">${idx + 1}</td>
-            <td><strong>${emp.empId || '-'}</strong></td>
-            <td>${emp.fullName || '-'}</td>
+            <td><strong>${escapeHtml(emp.empId || '-')}</strong></td>
+            <td>${escapeHtml(emp.fullName || '-')}</td>
             <td style="text-align:center;">
               <span class="score-pill ${isPass ? 'pass' : 'fail'}">${emp.score} / 12</span>
             </td>
@@ -1278,6 +1466,16 @@
       if (event.target.id === 'listModal') {
         closeModal();
       }
+    }
+
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
     }
   </script>
 </body>
